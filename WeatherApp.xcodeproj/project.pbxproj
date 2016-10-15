@@ -15,6 +15,8 @@
 		CFF522DB1DAE371800923228 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFF522DA1DAE371800923228 /* Assets.xcassets */; };
 		CFF522DE1DAE371800923228 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CFF522DC1DAE371800923228 /* LaunchScreen.storyboard */; };
 		CFF522E61DAE4FCE00923228 /* background-weather.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CFF522E51DAE4FCE00923228 /* background-weather.jpg */; };
+		CFF6A3D11DB22E7E00397661 /* APIKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFF6A3D01DB22E7E00397661 /* APIKeys.plist */; };
+		CFF6A3D71DB23AF700397661 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = CFF6A3D61DB23AF700397661 /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		CFF522DD1DAE371800923228 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CFF522DF1DAE371800923228 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CFF522E51DAE4FCE00923228 /* background-weather.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "background-weather.jpg"; sourceTree = "<group>"; };
+		CFF6A3D01DB22E7E00397661 /* APIKeys.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = APIKeys.plist; sourceTree = "<group>"; };
+		CFF6A3D61DB23AF700397661 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +57,7 @@
 		CFF522C71DAE371800923228 = {
 			isa = PBXGroup;
 			children = (
+				CFF6A3D61DB23AF700397661 /* .gitignore */,
 				CFF522D21DAE371800923228 /* WeatherApp */,
 				CFF522D11DAE371800923228 /* Products */,
 				CFEFDAB81DAFA7A20077A900 /* Frameworks */,
@@ -72,6 +77,7 @@
 			children = (
 				CFF522D31DAE371800923228 /* AppDelegate.swift */,
 				CFF522D51DAE371800923228 /* ViewController.swift */,
+				CFF6A3D01DB22E7E00397661 /* APIKeys.plist */,
 				CFEFDABB1DAFBF200077A900 /* Clouds - 2114.mp4 */,
 				CFF522D71DAE371800923228 /* Main.storyboard */,
 				CFF522E51DAE4FCE00923228 /* background-weather.jpg */,
@@ -142,8 +148,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				CFF522DE1DAE371800923228 /* LaunchScreen.storyboard in Resources */,
+				CFF6A3D71DB23AF700397661 /* .gitignore in Resources */,
 				CFF522DB1DAE371800923228 /* Assets.xcassets in Resources */,
 				CFEFDABC1DAFBF200077A900 /* Clouds - 2114.mp4 in Resources */,
+				CFF6A3D11DB22E7E00397661 /* APIKeys.plist in Resources */,
 				CFF522E61DAE4FCE00923228 /* background-weather.jpg in Resources */,
 				CFF522D91DAE371800923228 /* Main.storyboard in Resources */,
 			);

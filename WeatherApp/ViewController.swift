@@ -1,6 +1,6 @@
 //
 //  ViewController.swift
-//  API Demo
+//  WeatherApp
 //
 //  Created by Konada on 10/12/16.
 //  Copyright © 2016 Konada. All rights reserved.
@@ -15,31 +15,47 @@ import AVFoundation
 class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 		var player: AVPlayer?
+	
 
 		let locationManager = CLLocationManager()
 
 	@IBAction func submit(_ sender: AnyObject) {
 		
-
+		var lat: String = "0"
+		var lon: String = "0"
 		
-		locationManager.requestWhenInUseAuthorization();
-		if CLLocationManager.locationServicesEnabled() {
+		locationManager.requestWhenInUseAuthorization()
+		if CLLocationManager.locationServicesEnabled()  {
 			locationManager.delegate = self
 			locationManager.desiredAccuracy = kCLLocationAccuracyBest
 			locationManager.requestLocation()
-			
+			//print(locationManager.location?.coordinate.latitude)
+			//print(locationManager.location?.coordinate.latitude)
+
 		}
 		else{
 			self.resultLabel.text = "Location services disabled"
 			self.resultLabel.alpha = 1
 		}
 		
-		let lat = String(format: "%.2f",(locationManager.location?.coordinate.latitude)!)
-		let lon = String(format: "%.2f",(locationManager.location?.coordinate.longitude)!)
+		while locationManager.location?.coordinate.latitude == nil && locationManager.location?.coordinate.longitude == nil {
+
+			self.resultLabel.text = "Waiting for GPS signal, try again in a few secs"
+			self.resultLabel.alpha = 1
+
+		}
+		
+		lat = String.localizedStringWithFormat("%.2f", (locationManager.location?.coordinate.latitude)!)
+		lon = String.localizedStringWithFormat("%.2f",(locationManager.location?.coordinate.longitude)!)
+		
+
+		let api = valueForAPIKey(keyname:"APIKey")
+		//if you don't want to create plist file, just put your opeweather.org API Key in the line below:
+		//let api = "your key goes here - remember to comment the line above and uncomment this line"
 		
 		
-		if let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?lat=\(lat)&lon=\(lon)&appid=630238557df5db3173072e27c5b9e7f8") {
-	
+		if let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?lat=\(lat)&lon=\(lon)&appid=\(api)") {
+		
 
 		let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
 			
@@ -58,17 +74,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 						//print(jsonResult)
 						
 						print(jsonResult["name"])
+						print(jsonResult["rain"])
 						
+						var rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Any
+						rain = nil ?? "none"
+						print(rain)
 						
 						if let description = ((jsonResult["weather"] as? NSArray)?[0] as? NSDictionary)?["description"] as? String,
 							let temperature = (jsonResult["main"] as? NSDictionary)?["temp"] as? Double,
 							let humidity = (jsonResult["main"] as? NSDictionary)?["humidity"] as? Double,
 							let pressure = (jsonResult["main"] as? NSDictionary)?["pressure"] as? Double,
 							let clouds = (jsonResult["clouds"] as? NSDictionary)?["all"] as? Double,
-							let rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Double
+							var others: [String] = []
+							
 						{//humidity, pressure, overcast clouds, rain
 					
 							DispatchQueue.main.sync(execute: {
+								
+								others = ["humidity: \(humidity)", "pressure: \(pressure)", "clouds: \(clouds)", "rain: \(rain!)"]
 								
 								self.resultLabel.text = description
 								self.resultLabel.alpha = 1
@@ -80,6 +103,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 								
 								self.cityLabel.text = "in " + (jsonResult["name"]! as! String)+"?"
 								self.cityLabel.alpha = 1
+								
+								
+				
+								
+								self.otherLabel.alpha = 1
+								self.otherLabel.text = others[0]
+								//idea: animated list
 									})
 									
 								}
@@ -108,6 +138,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	@IBOutlet weak var temperatureLabel: UILabel!
 	@IBOutlet weak var cityLabel: UILabel!
 	@IBOutlet weak var tapButton: UIButton!
+	@IBOutlet weak var otherLabel: UILabel!
 	
 	
 	override func viewDidLoad() {
@@ -116,7 +147,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		resultLabel.alpha = 0
 		temperatureLabel.alpha = 0
 		cityLabel.alpha = 0
+		otherLabel.alpha = 0
 		
+		//background video:
 		let videoURL: URL = Bundle.main.url(forResource: "Clouds - 2114", withExtension: "mp4")!
 		
 		player = AVPlayer(url: videoURL)
@@ -154,14 +187,39 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		player?.play()
 	}
 	
+	func valueForAPIKey(keyname:String) -> String {
+
+  let filePath = Bundle.main.path(forResource: "APIKeys", ofType: "plist")
+  let plist = NSDictionary(contentsOfFile:filePath!)
+  let value = plist?.object(forKey: keyname) as! String
+  return value
+	}
 	
 }
 
 public extension UIView {
+	
+	func fadeIn(duration: TimeInterval = 1.0, delay: TimeInterval = 1.0, completion: @escaping ((Bool) -> Void) = {(finished: Bool) -> Void in}) {
+		UIView.animate(withDuration: duration, delay: delay, options: UIViewAnimationOptions.curveEaseIn, animations: {
+			self.alpha = 1.0}, completion: completion)}
 	
 	func fadeOut(withDuration duration: TimeInterval = 1.0) {
 		UIView.animate(withDuration: duration, animations: {
 			self.alpha = 0.2
 		})}
 }
+
+extension UIView {
+	func pushTransition(duration:CFTimeInterval) {
+		let animation:CATransition = CATransition()
+		animation.timingFunction = CAMediaTimingFunction(name:
+			kCAMediaTimingFunctionEaseInEaseOut)
+		animation.type = kCATransitionPush
+		animation.subtype = kCATransitionFromLeft
+		animation.duration = duration
+		self.layer.add(animation, forKey: kCATransitionPush)
+	}
+
+}
+
 
