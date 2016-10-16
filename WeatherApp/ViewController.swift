@@ -15,6 +15,7 @@ import AVFoundation
 class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 		var player: AVPlayer?
+		var timer: DispatchSourceTimer!
 	
 
 		let locationManager = CLLocationManager()
@@ -91,7 +92,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 					
 							DispatchQueue.main.sync(execute: {
 								
-								others = ["humidity: \(humidity)", "pressure: \(pressure)", "clouds: \(clouds)", "rain: \(rain!)"]
+								others = ["humidity: \(humidity)%", "pressure: \(pressure) hPa", "clouds: \(clouds)%", "rain: \(rain!)"]
 								
 								self.resultLabel.text = description
 								self.resultLabel.alpha = 1
@@ -104,13 +105,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 								self.cityLabel.text = "in " + (jsonResult["name"]! as! String)+"?"
 								self.cityLabel.alpha = 1
 								
-								
-				
-								
+								self.otherLabel.text = ""
 								self.otherLabel.alpha = 1
-								self.otherLabel.text = others[0]
-								//idea: animated list
-									})
+
+								
+								
+
+								let welcomeStrings = others
+								var index = welcomeStrings.startIndex
+								self.timer = DispatchSource.makeTimerSource(queue: .main)
+								self.timer.scheduleRepeating(deadline: .now(), interval: .seconds(2))
+								self.timer.setEventHandler { [weak self] in
+								UIView.transition(with: (self?.otherLabel)!, duration: 0.75, options: [.transitionCrossDissolve], animations: {
+										self?.otherLabel.text = welcomeStrings[index]}, completion: nil)
+									//self?.otherLabel.text = welcomeStrings[index]
+									index = index.advanced(by: 1)
+									if index == welcomeStrings.endIndex {
+										index = welcomeStrings.startIndex
+									}
+								}
+								self.timer.resume()
+								
+								
+								})
 									
 								}
 						
@@ -195,6 +212,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
   return value
 	}
 	
+	
 }
 
 public extension UIView {
@@ -207,6 +225,8 @@ public extension UIView {
 		UIView.animate(withDuration: duration, animations: {
 			self.alpha = 0.2
 		})}
+	
+
 }
 
 extension UIView {
