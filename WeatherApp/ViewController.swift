@@ -30,8 +30,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			locationManager.delegate = self
 			locationManager.desiredAccuracy = kCLLocationAccuracyBest
 			locationManager.requestLocation()
-			//print(locationManager.location?.coordinate.latitude)
-			//print(locationManager.location?.coordinate.latitude)
 
 		}
 		else{
@@ -71,15 +69,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 					do {
 						
 						let jsonResult = try JSONSerialization.jsonObject(with: urlContent, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
-						
-						//print(jsonResult)
-						
-						print(jsonResult["name"])
-						print(jsonResult["rain"])
-						
-						var rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Any
-						rain = nil ?? "none"
+						print(jsonResult)
+
+						var rain: Double?
+						rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Double
+						if rain == nil {rain = 0} else { rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Double}
+						var snow: Double?
+						snow = (jsonResult["snow"] as? NSDictionary)?["3h"] as? Double
 						print(rain)
+						if snow == nil {snow = 0} else { snow = (jsonResult["snow"] as? NSDictionary)?["3h"] as? Double}
+						
+						let rs: String
+						
+						if snow != 0 {rs = "snow: \(snow!)"} else {rs = "rain: \(rain!)"}
+
 						
 						if let description = ((jsonResult["weather"] as? NSArray)?[0] as? NSDictionary)?["description"] as? String,
 							let temperature = (jsonResult["main"] as? NSDictionary)?["temp"] as? Double,
@@ -88,19 +91,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 							let clouds = (jsonResult["clouds"] as? NSDictionary)?["all"] as? Double,
 							var others: [String] = []
 							
-						{//humidity, pressure, overcast clouds, rain
+						{
 					
 							DispatchQueue.main.sync(execute: {
 								
-								others = ["humidity: \(humidity)%", "pressure: \(pressure) hPa", "clouds: \(clouds)%", "rain: \(rain!)"]
+								others = ["humidity: \(humidity)%", "pressure: \(pressure) hPa", "clouds: \(clouds)%", rs]
 								
 								self.resultLabel.text = description
 								self.resultLabel.alpha = 1
-								print("It's working")
+
 
 								self.temperatureLabel.text = String.localizedStringWithFormat("%.0f %@", (temperature - 273.15), "°C")
 								self.temperatureLabel.alpha = 1
-								print("It's working too")
+
 								
 								self.cityLabel.text = "in " + (jsonResult["name"]! as! String)+"?"
 								self.cityLabel.alpha = 1
@@ -118,7 +121,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 								self.timer.setEventHandler { [weak self] in
 								UIView.transition(with: (self?.otherLabel)!, duration: 0.75, options: [.transitionCrossDissolve], animations: {
 										self?.otherLabel.text = welcomeStrings[index]}, completion: nil)
-									//self?.otherLabel.text = welcomeStrings[index]
 									index = index.advanced(by: 1)
 									if index == welcomeStrings.endIndex {
 										index = welcomeStrings.startIndex
