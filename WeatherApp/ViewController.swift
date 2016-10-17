@@ -82,7 +82,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 						let rs: String
 						
 						if snow != 0 {rs = "snow: \(snow!)"} else {rs = "rain: \(rain!)"}
-
 						
 						if let description = ((jsonResult["weather"] as? NSArray)?[0] as? NSDictionary)?["description"] as? String,
 							let temperature = (jsonResult["main"] as? NSDictionary)?["temp"] as? Double,
@@ -90,7 +89,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 							let pressure = (jsonResult["main"] as? NSDictionary)?["pressure"] as? Double,
 							let clouds = (jsonResult["clouds"] as? NSDictionary)?["all"] as? Double,
 							var others: [String] = []
-							
 						{
 					
 							DispatchQueue.main.sync(execute: {
