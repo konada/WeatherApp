@@ -7,145 +7,107 @@
 //
 
 import UIKit
-import CoreLocation
 import AVKit
 import AVFoundation
 
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController {
 	
 		var player: AVPlayer?
 		var timer: DispatchSourceTimer!
 	
 
-		let locationManager = CLLocationManager()
 
 	@IBAction func submit(_ sender: AnyObject) {
-		
-		var lat: String = "0"
-		var lon: String = "0"
-		
-		locationManager.requestWhenInUseAuthorization()
-		if CLLocationManager.locationServicesEnabled()  {
-			locationManager.delegate = self
-			locationManager.desiredAccuracy = kCLLocationAccuracyBest
-			locationManager.requestLocation()
-
-		}
-		else{
-			self.resultLabel.text = "Location services disabled"
-			self.resultLabel.alpha = 1
-		}
-		
-		while locationManager.location?.coordinate.latitude == nil && locationManager.location?.coordinate.longitude == nil {
-
-			self.resultLabel.text = "Waiting for GPS signal, try again in a few secs"
-			self.resultLabel.alpha = 1
-
-		}
-		
-		lat = String.localizedStringWithFormat("%.2f", (locationManager.location?.coordinate.latitude)!)
-		lon = String.localizedStringWithFormat("%.2f",(locationManager.location?.coordinate.longitude)!)
 		
 
 		let api = valueForAPIKey(keyname:"APIKey")
 		//if you don't want to create plist file, just put your opeweather.org API Key in the line below:
 		//let api = "your key goes here - remember to comment the line above and uncomment this line"
 		
+
+		LocationService()
 		
-		if let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?lat=\(lat)&lon=\(lon)&appid=\(api)") {
+		let locationServ = Location(lat: "0", lon: "0", error: "Error")
 		
+		
+		if let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?lat=\(locationServ.formattedLat())&lon=\(locationServ.formattedLon())&appid=\(api)") {
+		
+			//if let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=630238557df5db3173072e27c5b9e7f8") {
 
-		let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-			
-			if error != nil {
+			let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
 				
-				print(error)
-				
-			} else {
-				
-				if let urlContent = data {
+				if error != nil {
 					
-					do {
-						
-						let jsonResult = try JSONSerialization.jsonObject(with: urlContent, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
-						print(jsonResult)
-
-						var rain: Double?
-						rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Double
-						if rain == nil {rain = 0} else { rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Double}
-						var snow: Double?
-						snow = (jsonResult["snow"] as? NSDictionary)?["3h"] as? Double
-						print(rain)
-						if snow == nil {snow = 0} else { snow = (jsonResult["snow"] as? NSDictionary)?["3h"] as? Double}
-						
-						let rs: String
-						
-						if snow != 0 {rs = "snow: \(snow!)"} else {rs = "rain: \(rain!)"}
-						
-						if let description = ((jsonResult["weather"] as? NSArray)?[0] as? NSDictionary)?["description"] as? String,
-							let temperature = (jsonResult["main"] as? NSDictionary)?["temp"] as? Double,
-							let humidity = (jsonResult["main"] as? NSDictionary)?["humidity"] as? Double,
-							let pressure = (jsonResult["main"] as? NSDictionary)?["pressure"] as? Double,
-							let clouds = (jsonResult["clouds"] as? NSDictionary)?["all"] as? Double,
-							var others: [String] = []
-						{
+					print(error)
 					
-							DispatchQueue.main.sync(execute: {
+				} else {
+					
+					if let urlContent = data {
+						
+						do {
+							
+							let jsonResult = try JSONSerialization.jsonObject(with: urlContent, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
+							print(jsonResult)
+							let weatherPar = WeatherParams(jsonResult)
+							
+							if weatherPar != nil {
+							
 								
-								others = ["humidity: \(humidity)%", "pressure: \(pressure) hPa", "clouds: \(clouds)%", rs]
-								
-								self.resultLabel.text = description
-								self.resultLabel.alpha = 1
-
-
-								self.temperatureLabel.text = String.localizedStringWithFormat("%.0f %@", (temperature - 273.15), "°C")
-								self.temperatureLabel.alpha = 1
-
-								
-								self.cityLabel.text = "in " + (jsonResult["name"]! as! String)+"?"
-								self.cityLabel.alpha = 1
-								
-								self.otherLabel.text = ""
-								self.otherLabel.alpha = 1
-
-								
-								
-
-								let welcomeStrings = others
-								var index = welcomeStrings.startIndex
-								self.timer = DispatchSource.makeTimerSource(queue: .main)
-								self.timer.scheduleRepeating(deadline: .now(), interval: .seconds(2))
-								self.timer.setEventHandler { [weak self] in
-								UIView.transition(with: (self?.otherLabel)!, duration: 0.75, options: [.transitionCrossDissolve], animations: {
-										self?.otherLabel.text = welcomeStrings[index]}, completion: nil)
-									index = index.advanced(by: 1)
-									if index == welcomeStrings.endIndex {
-										index = welcomeStrings.startIndex
-									}
-								}
-								self.timer.resume()
-								
-								
-								})
+								DispatchQueue.main.sync(execute: {
 									
-								}
-						
-						
-					} catch {
-						
-						print("JSON Processing Failed")
-						self.resultLabel.text = "JSON Processing Failed, API KEY NEEDED!"
-						self.resultLabel.alpha = 1
+									
+									self.resultLabel.text = weatherPar.description
+									self.resultLabel.alpha = 1
+									
+									
+									self.temperatureLabel.text = weatherPar.localizedTemperature()
+									self.temperatureLabel.alpha = 1
+									
+									
+									self.cityLabel.text = weatherPar.formattedLocation()
+									self.cityLabel.alpha = 1
+									
+									self.otherLabel.text = ""
+									self.otherLabel.alpha = 1
+									
+									
+									
+									
+									let welcomeStrings = weatherPar.others
+									var index = welcomeStrings.startIndex
+									self.timer = DispatchSource.makeTimerSource(queue: .main)
+									self.timer.scheduleRepeating(deadline: .now(), interval: .seconds(2))
+									self.timer.setEventHandler { [weak self] in
+										UIView.transition(with: (self?.otherLabel)!, duration: 0.75, options: [.transitionCrossDissolve], animations: {
+											self?.otherLabel.text = welcomeStrings[index]}, completion: nil)
+										index = index.advanced(by: 1)
+										if index == welcomeStrings.endIndex {
+											index = welcomeStrings.startIndex
+										}
+									}
+									self.timer.resume()
+									
+									
+								})
+								
+							}
+							
+							
+						} catch {
+							
+							print("JSON Processing Failed")
+							self.resultLabel.text = "JSON Processing Failed, API KEY NEEDED!"
+							self.resultLabel.alpha = 1
+						}
 					}
+					
 				}
 				
 			}
 			
-		}
-		
-		task.resume()
-		tapButton.fadeOut(withDuration: 3)
+			task.resume()
+			tapButton.fadeOut(withDuration: 3)
 		} else {
 			resultLabel.text = "Couldn't find weather for that city."
 			self.resultLabel.alpha = 1
@@ -192,14 +154,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// Dispose of any resources that can be recreated.
 	}
 
-	func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-		
-	}
-	
-	func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-		print(error)
-	}
-	func loopVideo() {
+		func loopVideo() {
 		player?.seek(to: kCMTimeZero)
 		player?.play()
 	}
@@ -215,7 +170,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 }
 
-public extension UIView {
+extension UIView {
 	
 	func fadeIn(duration: TimeInterval = 1.0, delay: TimeInterval = 1.0, completion: @escaping ((Bool) -> Void) = {(finished: Bool) -> Void in}) {
 		UIView.animate(withDuration: duration, delay: delay, options: UIViewAnimationOptions.curveEaseIn, animations: {
