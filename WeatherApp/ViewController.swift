@@ -9,6 +9,7 @@
 import UIKit
 import AVKit
 import AVFoundation
+import CoreLocation
 
 
 class ViewController: UIViewController {
@@ -20,15 +21,14 @@ class ViewController: UIViewController {
 
 	@IBAction func submit(_ sender: AnyObject) {
 		
+		LocationService.sharedInstance.startUpdatingLocation()
 
 		let api = valueForAPIKey(keyname:"APIKey")
 		//if you don't want to create plist file, just put your opeweather.org API Key in the line below:
 		//let api = "your key goes here - remember to comment the line above and uncomment this line"
 		
-
-		LocationService()
 		
-		let locationServ = Location(lat: "0", lon: "0", error: "Error")
+		let locationServ = LocationService()
 		
 		
 		if let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?lat=\(locationServ.formattedLat())&lon=\(locationServ.formattedLon())&appid=\(api)") {
@@ -122,7 +122,10 @@ class ViewController: UIViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		// Do any additional setup after loading the view, typically from a nib.
+	
+		//LocationService.sharedInstance.delegate = self
+		
+
 		resultLabel.alpha = 0
 		temperatureLabel.alpha = 0
 		cityLabel.alpha = 0
@@ -136,16 +139,12 @@ class ViewController: UIViewController {
 		player?.isMuted = true
 		
 		let playerLayer = AVPlayerLayer(player: player)
+		
 		playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
 		playerLayer.zPosition = -1
-		
 		playerLayer.frame = view.frame
-		
 		view.layer.addSublayer(playerLayer)
-		
 		player?.play()
-		
-		//loop video
 		NotificationCenter.default.addObserver(self, selector: #selector(ViewController.loopVideo), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
 		
 	}
@@ -166,7 +165,6 @@ class ViewController: UIViewController {
   let value = plist?.object(forKey: keyname) as! String
   return value
 	}
-	
 	
 }
 
