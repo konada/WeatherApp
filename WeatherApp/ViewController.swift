@@ -16,8 +16,6 @@ class ViewController: UIViewController {
 	
 		var player: AVPlayer?
 		var timer: DispatchSourceTimer!
-	
-
 
 	@IBAction func submit(_ sender: AnyObject) {
 		
@@ -26,44 +24,29 @@ class ViewController: UIViewController {
 		let api = valueForAPIKey(keyname:"APIKey")
 		//if you don't want to create plist file, just put your opeweather.org API Key in the line below:
 		//let api = "your key goes here - remember to comment the line above and uncomment this line"
-		
-		
 		let locationServ = LocationService()
 		
-		
 		if let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?lat=\(locationServ.formattedLat())&lon=\(locationServ.formattedLon())&appid=\(api)") {
-		
-			//if let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=630238557df5db3173072e27c5b9e7f8") {
-
 			let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-				
 				if error != nil {
-					
-					print(error)
-					
+					print(error)					
 				} else {
-					
 					if let urlContent = data {
-						
 						do {
-							
 							let jsonResult = try JSONSerialization.jsonObject(with: urlContent, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
+							
 							print(jsonResult)
+							
 							let weatherPar = WeatherParams(jsonResult)
 							
 							if weatherPar != nil {
-							
-								
 								DispatchQueue.main.sync(execute: {
-									
 									
 									self.resultLabel.text = weatherPar.description
 									self.resultLabel.alpha = 1
 									
-									
 									self.temperatureLabel.text = weatherPar.localizedTemperature()
 									self.temperatureLabel.alpha = 1
-									
 									
 									self.cityLabel.text = weatherPar.formattedLocation()
 									self.cityLabel.alpha = 1
@@ -71,11 +54,9 @@ class ViewController: UIViewController {
 									self.otherLabel.text = ""
 									self.otherLabel.alpha = 1
 									
-									
-									
-									
 									let welcomeStrings = weatherPar.others
 									var index = welcomeStrings.startIndex
+									
 									self.timer = DispatchSource.makeTimerSource(queue: .main)
 									self.timer.scheduleRepeating(deadline: .now(), interval: .seconds(2))
 									self.timer.setEventHandler { [weak self] in
@@ -87,25 +68,16 @@ class ViewController: UIViewController {
 										}
 									}
 									self.timer.resume()
-									
-									
 								})
-								
 							}
-							
-							
 						} catch {
-							
 							print("JSON Processing Failed")
 							self.resultLabel.text = "JSON Processing Failed, API KEY NEEDED!"
 							self.resultLabel.alpha = 1
 						}
 					}
-					
 				}
-				
 			}
-			
 			task.resume()
 			tapButton.fadeOut(withDuration: 3)
 		} else {
@@ -113,6 +85,7 @@ class ViewController: UIViewController {
 			self.resultLabel.alpha = 1
 		}
 	}
+	
 	@IBOutlet weak var resultLabel: UILabel!
 	@IBOutlet weak var temperatureLabel: UILabel!
 	@IBOutlet weak var cityLabel: UILabel!
@@ -122,10 +95,7 @@ class ViewController: UIViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-	
-		//LocationService.sharedInstance.delegate = self
 		
-
 		resultLabel.alpha = 0
 		temperatureLabel.alpha = 0
 		cityLabel.alpha = 0
@@ -146,8 +116,8 @@ class ViewController: UIViewController {
 		view.layer.addSublayer(playerLayer)
 		player?.play()
 		NotificationCenter.default.addObserver(self, selector: #selector(ViewController.loopVideo), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
-		
 	}
+	
 	override func didReceiveMemoryWarning() {
 		super.didReceiveMemoryWarning()
 		// Dispose of any resources that can be recreated.
@@ -159,17 +129,15 @@ class ViewController: UIViewController {
 	}
 	
 	func valueForAPIKey(keyname:String) -> String {
-
   let filePath = Bundle.main.path(forResource: "APIKeys", ofType: "plist")
   let plist = NSDictionary(contentsOfFile:filePath!)
   let value = plist?.object(forKey: keyname) as! String
+
   return value
 	}
-	
 }
 
 extension UIView {
-	
 	func fadeIn(duration: TimeInterval = 1.0, delay: TimeInterval = 1.0, completion: @escaping ((Bool) -> Void) = {(finished: Bool) -> Void in}) {
 		UIView.animate(withDuration: duration, delay: delay, options: UIViewAnimationOptions.curveEaseIn, animations: {
 			self.alpha = 1.0}, completion: completion)}
@@ -178,13 +146,12 @@ extension UIView {
 		UIView.animate(withDuration: duration, animations: {
 			self.alpha = 0.2
 		})}
-	
-
 }
 
 extension UIView {
 	func pushTransition(duration:CFTimeInterval) {
 		let animation:CATransition = CATransition()
+		
 		animation.timingFunction = CAMediaTimingFunction(name:
 			kCAMediaTimingFunctionEaseInEaseOut)
 		animation.type = kCATransitionPush
@@ -192,7 +159,4 @@ extension UIView {
 		animation.duration = duration
 		self.layer.add(animation, forKey: kCATransitionPush)
 	}
-
 }
-
-

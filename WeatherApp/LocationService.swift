@@ -33,7 +33,6 @@ class LocationService: NSObject, CLLocationManagerDelegate {
 		}
 		
 		if CLLocationManager.authorizationStatus() == .notDetermined {
-
 			locationManager.requestWhenInUseAuthorization()
 		}
 		
@@ -58,7 +57,6 @@ class LocationService: NSObject, CLLocationManagerDelegate {
 		guard let location = locations.last else {
 			return
 		}
-		
 		// singleton for get last(current) location
 		currentLocation = location
 		
@@ -73,19 +71,12 @@ class LocationService: NSObject, CLLocationManagerDelegate {
 	}
 	
 	func formattedLat() -> String{
-		
-		
 		return String.localizedStringWithFormat("%.2f", (locationManager!.location?.coordinate.latitude)!)
 	}
 	
 	func formattedLon() -> String{
-		
-		
 		return String.localizedStringWithFormat("%.2f",(locationManager!.location?.coordinate.longitude)!)
 	}
-	
-	
-
 	
 	// Private function
 	fileprivate func updateLocation(_ currentLocation: CLLocation){
@@ -93,7 +84,6 @@ class LocationService: NSObject, CLLocationManagerDelegate {
 		guard let delegate = self.delegate else {
 			return
 		}
-		
 		delegate.tracingLocation(currentLocation)
 	}
 	
@@ -102,9 +92,6 @@ class LocationService: NSObject, CLLocationManagerDelegate {
 		guard let delegate = self.delegate else {
 			return
 		}
-		
 		delegate.tracingLocationDidFailWithError(error)
 	}
 }
-
-

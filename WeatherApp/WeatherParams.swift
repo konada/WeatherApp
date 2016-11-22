@@ -19,14 +19,13 @@ struct WeatherParams {
 	var rain: Double?
 	var snow: Double?
 	var name: String
+	let rs: String
 
 	init(_ jsonResult: NSDictionary) {
 		rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Double
 		if rain == nil {rain = 0} else { rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Double}
 		snow = (jsonResult["snow"] as? NSDictionary)?["3h"] as? Double
 		if snow == nil {snow = 0} else { snow = (jsonResult["snow"] as? NSDictionary)?["3h"] as? Double}
-		
-		let rs: String
 		
 		if snow != 0 {rs = "snow: \(snow!)"} else {rs = "rain: \(rain!)"}
 		
