@@ -82,6 +82,7 @@
 				CFF522D31DAE371800923228 /* AppDelegate.swift */,
 				CFF522D51DAE371800923228 /* ViewController.swift */,
 				CF8CB6671DD5CDD10047F53E /* WeatherParams.swift */,
+				CF8CB6691DD5DB230047F53E /* LocationService.swift */,
 				CFF6A3D01DB22E7E00397661 /* APIKeys.plist */,
 				CFEFDABB1DAFBF200077A900 /* Clouds - 2114.mp4 */,
 				CFF522D71DAE371800923228 /* Main.storyboard */,
@@ -89,7 +90,6 @@
 				CFF522DA1DAE371800923228 /* Assets.xcassets */,
 				CFF522DC1DAE371800923228 /* LaunchScreen.storyboard */,
 				CFF522DF1DAE371800923228 /* Info.plist */,
-				CF8CB6691DD5DB230047F53E /* LocationService.swift */,
 			);
 			path = WeatherApp;
 			sourceTree = "<group>";

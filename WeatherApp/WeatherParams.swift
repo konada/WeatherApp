@@ -8,7 +8,7 @@
 
 import Foundation
 
-class WeatherParams {
+struct WeatherParams {
 
 	var description :String?
 	var temperature :Double!
