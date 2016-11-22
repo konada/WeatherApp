@@ -26,7 +26,6 @@ struct WeatherParams {
 		if rain == nil {rain = 0} else { rain = (jsonResult["rain"] as? NSDictionary)?["3h"] as? Double}
 		snow = (jsonResult["snow"] as? NSDictionary)?["3h"] as? Double
 		if snow == nil {snow = 0} else { snow = (jsonResult["snow"] as? NSDictionary)?["3h"] as? Double}
-		
 		if snow != 0 {rs = "snow: \(snow!)"} else {rs = "rain: \(rain!)"}
 		
 		description = ((jsonResult["weather"] as? NSArray)?[0] as? NSDictionary)?["description"] as? String
@@ -38,13 +37,11 @@ struct WeatherParams {
 		name = jsonResult["name"]! as! String
 	}
 	
-	func localizedTemperature() -> String {
-		return String.localizedStringWithFormat("%.0f %@", (temperature - 273.15), "°C")
+func localizedTemperature() -> String {
+	return String.localizedStringWithFormat("%.0f %@", (temperature - 273.15), "°C")
 	}
 	
 func formattedLocation() -> String {
 	return "in " + name + "?"
-	}
-	
-	
+	}	
 }

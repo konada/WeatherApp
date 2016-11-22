@@ -18,7 +18,6 @@ class ViewController: UIViewController {
 		var timer: DispatchSourceTimer!
 
 	@IBAction func submit(_ sender: AnyObject) {
-		
 		LocationService.sharedInstance.startUpdatingLocation()
 
 		let api = valueForAPIKey(keyname:"APIKey")
@@ -41,7 +40,6 @@ class ViewController: UIViewController {
 							
 							if weatherPar != nil {
 								DispatchQueue.main.sync(execute: {
-									
 									self.resultLabel.text = weatherPar.description
 									self.resultLabel.alpha = 1
 									
